@@ -33,6 +33,8 @@
   
 最后将输出的output文件中所有0替换成O
 
+最后结果：F1 Score =0.885836
+
 以下是原项目的readme.md
 
 ## A simple BiLSTM-CRF model for Chinese Named Entity Recognition

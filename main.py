@@ -94,30 +94,6 @@ elif args.mode == 'test':
     model.test(test_data)
 
 # demo 小测试
-elif args.mode == 'demo':
-    ckpt_file = tf.train.latest_checkpoint(model_path)
-    print(ckpt_file)
-    paths['model_path'] = ckpt_file
-    model = BiLSTM_CRF(args, embeddings, tag2label, word2id, paths, config=config)
-    model.build_graph()
-    saver = tf.train.Saver()
-    with tf.Session(config=config) as sess:
-        print('============= demo =============')
-        saver.restore(sess, ckpt_file)
-        while(1):
-            print('Please input your sentence:')
-            demo_sent = input()
-            if demo_sent == '' or demo_sent.isspace():
-                print('See you next time!')
-                break
-            else:
-                demo_sent = list(demo_sent.strip())
-                demo_data = [(demo_sent, ['O'] * len(demo_sent))]
-                tag = model.demo_one(sess, demo_data)
-                PER, LOC, ORG, TIM = get_entity(tag, demo_sent)
-                print('PER: {}\nLOC: {}\nORG: {}\nTIM: {}'.format(PER, LOC, ORG, TIM))
-
-##  predict整个文件
 # elif args.mode == 'demo':
 #     ckpt_file = tf.train.latest_checkpoint(model_path)
 #     print(ckpt_file)
@@ -128,92 +104,119 @@ elif args.mode == 'demo':
 #     with tf.Session(config=config) as sess:
 #         print('============= demo =============')
 #         saver.restore(sess, ckpt_file)
-#
-#         ORGANIZATION = ['B-ORGANIZATION', 'I-ORGANIZATION', 'O-ORGANIZATION']
-#         TIME = ['B-TIME', 'I-TIME', 'O-TIME']
-#         PERSON = ['B-PERSON', 'I-PERSON', 'O-PERSON']
-#         LOCATION = ['B-LOCATION', 'I-LOCATION', 'O-LOCATION']
-#         BIO = [ORGANIZATION, TIME, PERSON, LOCATION]
-#         newB = ['B-ORG', 'B-TIM', 'B-PER', 'B-LOC']
-#         newI = ['I-ORG', 'I-TIM', 'I-PER', 'I-LOC']
-#
-#         with open('mydata/test.content.txt', encoding='utf-8') as testf:
-#             result=[]
-#             lines = testf.readlines()
-#             for line in lines:
-#                 demo_sent = line.rstrip('\n').replace(' ', '')
-#
-#                 word_length = len(demo_sent)
-#
-#                 if demo_sent == '' or demo_sent.isspace():
-#                     print('See you next time!')
-#                     break
-#                 else:
-#                     demo_sent = list(demo_sent.strip())
-#                     demo_data = [(demo_sent, ['O'] * len(demo_sent))]
-#                     tag = model.demo_one(sess, demo_data)
-#
-#                     tag_length = len(tag)
-#                     assert word_length == tag_length
-#                     # result.append(tag)
-#
-#                     # 改变标签方式，删除重复
-#                     i = 0
-#                     tag_delete = []
-#                     line_spilt = line.rstrip('\n').split(' ')
-#                     for word in line_spilt:
-#                         length = len(word)
-#                         tag_delete.append(tag[i])
-#                         i += length
-#
-#                     tag = tag_delete
-#                     assert len(tag) == len(line_spilt)
-#
-#                     last = -1
-#                     for i in range(len(tag)):
-#                         # 如果遇到第一个newB中的，转换成B中的，并且如果后面还是newB的或者newI的
-#                         if tag[i] == 0:
-#                             last = -1
-#                             continue
-#                         if tag[i] in newB:
-#                             index = -1
-#                             for j in range(0, 4):
-#                                 if newB[j] == tag[i]:
-#                                     index = j
-#                                     break
-#                             # 如果上一个也是last，那这个就在newI中
-#                             if last == index:
-#                                 tag[i] = BIO[index][1]
-#                             else:
-#                                 tag[i] = BIO[index][0]
-#                                 last = index
-#                         # else tag[i] in newI
-#                         else:
-#                             index = -1
-#                             for j in range(0, 4):
-#                                 if newI[j] == tag[i]:
-#                                     index = j
-#                                     break
-#                             tag[i] = BIO[index][1]
-#                             last = index
-#                     # 目前只有B-和I-，没有O-，再遍历一次
-#                     for i in range(len(tag)):
-#                         if tag[i] == 'I-ORGANIZATION' and i + 1 < len(tag) and tag[i + 1] != 'O-ORGANIZATION' and tag[
-#                             i + 1] != tag[i]:
-#                             tag[i] = 'O-ORGANIZATION'
-#                         elif tag[i] == 'I-TIME' and i + 1 < len(tag) and tag[i + 1] != 'O-TIME' and tag[i + 1] != tag[
-#                             i]:
-#                             tag[i] = 'O-TIME'
-#                         elif tag[i] == 'I-PERSON' and i + 1 < len(tag) and tag[i + 1] != 'O-PERSON' and tag[i + 1] != \
-#                                 tag[i]:
-#                             tag[i] = 'O-PERSON'
-#                         elif tag[i] == 'I-LOCATION' and i + 1 < len(tag) and tag[i + 1] != 'O-LOCATION' and tag[
-#                             i + 1] != tag[i]:
-#                             tag[i] = 'O-LOCATION'
-#                 result.append(tag)
-#
-#             with open('mydata/test.prediction.txt', 'w') as predictf:
-#                 for res in result:
-#                     for i in res:
-#                         predictf.write(str(i) + ' ')
-#                     predictf.write('\n')
+#         while(1):
+#             print('Please input your sentence:')
+#             demo_sent = input()
+#             if demo_sent == '' or demo_sent.isspace():
+#                 print('See you next time!')
+#                 break
+#             else:
+#                 demo_sent = list(demo_sent.strip())
+#                 demo_data = [(demo_sent, ['O'] * len(demo_sent))]
+#                 tag = model.demo_one(sess, demo_data)
+#                 PER, LOC, ORG, TIM = get_entity(tag, demo_sent)
+#                 print('PER: {}\nLOC: {}\nORG: {}\nTIM: {}'.format(PER, LOC, ORG, TIM))
+
+#  predict整个文件
+elif args.mode == 'demo':
+    ckpt_file = tf.train.latest_checkpoint(model_path)
+    print(ckpt_file)
+    paths['model_path'] = ckpt_file
+    model = BiLSTM_CRF(args, embeddings, tag2label, word2id, paths, config=config)
+    model.build_graph()
+    saver = tf.train.Saver()
+    with tf.Session(config=config) as sess:
+        print('============= demo =============')
+        saver.restore(sess, ckpt_file)
+
+        ORGANIZATION = ['B-ORGANIZATION', 'I-ORGANIZATION', 'O-ORGANIZATION']
+        TIME = ['B-TIME', 'I-TIME', 'O-TIME']
+        PERSON = ['B-PERSON', 'I-PERSON', 'O-PERSON']
+        LOCATION = ['B-LOCATION', 'I-LOCATION', 'O-LOCATION']
+        BIO = [ORGANIZATION, TIME, PERSON, LOCATION]
+        newB = ['B-ORG', 'B-TIM', 'B-PER', 'B-LOC']
+        newI = ['I-ORG', 'I-TIM', 'I-PER', 'I-LOC']
+
+        input='mydata/test.content.txt'
+        output='mydata/test.prediction.txt'
+
+        with open(input, encoding='utf-8') as testf:
+            result=[]
+            lines = testf.readlines()
+            for line in lines:
+                demo_sent = line.rstrip('\n').replace(' ', '')
+
+                word_length = len(demo_sent)
+
+                if demo_sent == '' or demo_sent.isspace():
+                    print('End')
+                    break
+                else:
+                    demo_sent = list(demo_sent.strip())
+                    demo_data = [(demo_sent, ['O'] * len(demo_sent))]
+                    tag = model.demo_one(sess, demo_data)
+
+                    tag_length = len(tag)
+                    assert word_length == tag_length
+                    # result.append(tag)
+
+                    # 改变标签方式，删除重复
+                    i = 0
+                    tag_delete = []
+                    line_spilt = line.rstrip('\n').split(' ')
+                    for word in line_spilt:
+                        length = len(word)
+                        tag_delete.append(tag[i])
+                        i += length
+
+                    tag = tag_delete
+                    assert len(tag) == len(line_spilt)
+
+                    last = -1
+                    for i in range(len(tag)):
+                        # 如果遇到第一个newB中的，转换成B中的，并且如果后面还是newB的或者newI的
+                        if tag[i] == 0:
+                            last = -1
+                            continue
+                        if tag[i] in newB:
+                            index = -1
+                            for j in range(0, 4):
+                                if newB[j] == tag[i]:
+                                    index = j
+                                    break
+                            # 如果上一个也是last，那这个就在newI中
+                            if last == index:
+                                tag[i] = BIO[index][1]
+                            else:
+                                tag[i] = BIO[index][0]
+                                last = index
+                        # else tag[i] in newI
+                        else:
+                            index = -1
+                            for j in range(0, 4):
+                                if newI[j] == tag[i]:
+                                    index = j
+                                    break
+                            tag[i] = BIO[index][1]
+                            last = index
+                    # 目前只有B-和I-，没有O-，再遍历一次
+                    for i in range(len(tag)):
+                        if tag[i] == 'I-ORGANIZATION' and i + 1 < len(tag) and tag[i + 1] != 'O-ORGANIZATION' and tag[
+                            i + 1] != tag[i]:
+                            tag[i] = 'O-ORGANIZATION'
+                        elif tag[i] == 'I-TIME' and i + 1 < len(tag) and tag[i + 1] != 'O-TIME' and tag[i + 1] != tag[
+                            i]:
+                            tag[i] = 'O-TIME'
+                        elif tag[i] == 'I-PERSON' and i + 1 < len(tag) and tag[i + 1] != 'O-PERSON' and tag[i + 1] != \
+                                tag[i]:
+                            tag[i] = 'O-PERSON'
+                        elif tag[i] == 'I-LOCATION' and i + 1 < len(tag) and tag[i + 1] != 'O-LOCATION' and tag[
+                            i + 1] != tag[i]:
+                            tag[i] = 'O-LOCATION'
+                result.append(tag)
+
+            with open(output, 'w') as predictf:
+                for res in result:
+                    for i in res:
+                        predictf.write(str(i) + ' ')
+                    predictf.write('\n')
