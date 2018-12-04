@@ -1,3 +1,23 @@
+## ChineseNER
+运行环境：python3  TensorFlow 1.2
+
+### Train
+#### 使用CreateData.py修改输入文件的格式，从分词变为单个单词，从BIO标签转为BI标签
+  修改CreateData.py中的input和output（input为文件train.txt的路径）
+  `python CreateData.py `
+  将输出的output文件按90%:10%的比例分成训练集和验证集，改名为train_data和test_data放到data_path文件夹中
+#### 调整超参数进行训练
+  `python main.py --mode=train `
+  可以对main.py中的超参数修改，如
+  `python main.py --mode=train --epoch=30`
+#### 使用模型进行预测
+  main.py中，有两行
+  `elif args.mode == 'demo\': `
+  运行
+  `python main.py --mode=demo --demo_model=1543146557`
+  前者可以直接输入句子进行测试，后者可以预测文件并产生输出。在使用后者前记得修改里面的input和output路径。
+最后将输出的output文件中所有0替换成O。
+
 ## A simple BiLSTM-CRF model for Chinese Named Entity Recognition
 
 This repository includes the code for buliding a very simple __character-based BiLSTM-CRF sequence labelling model__ for Chinese Named Entity Recognition task. Its goal is to recognize three types of Named Entity: PERSON, LOCATION and ORGANIZATION.
