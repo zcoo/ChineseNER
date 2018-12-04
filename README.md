@@ -29,9 +29,11 @@
   
   `python main.py --mode=demo --demo_model=1543146557`
   
-  前者可以直接输入句子进行测试，后者可以预测文件并产生输出。在使用后者前记得修改里面的input和output路径。
+  前者可以直接输入句子进行测试，后者可以预测文件并产生输出。在使用后者前记得修改里面的input和output路径
   
-最后将输出的output文件中所有0替换成O。
+最后将输出的output文件中所有0替换成O
+
+以下是原项目的readme.md
 
 ## A simple BiLSTM-CRF model for Chinese Named Entity Recognition
 
