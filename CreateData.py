@@ -1,6 +1,6 @@
-
-
-with open('mydata/train.txt', encoding='utf-8') as f:
+input='mydata/train.txt'
+output='mydata/train'
+with open(input, encoding='utf-8') as f:
     lines = f.readlines()
 word_list = []
 format_word_list = []
@@ -39,7 +39,7 @@ for word in format_word_list:
             real_format_word_list.append(word[0] + '	' + newI[index])
     else:
         real_format_word_list.append(word[0] + '	I' + word[1][1:5])
-with open("mydata/train",'wb') as f:
+with open(output,'wb') as f:
     for tmp in real_format_word_list:
         tmpstr=tmp+'\n'
         zzz=tmpstr.encode("utf-8")
