@@ -35,6 +35,8 @@
 
 最后结果：F1 Score =0.885836
 
+原项目的(地址)[https://github.com/Determined22/zh-NER-TF]
+
 以下是原项目的readme.md
 
 ## A simple BiLSTM-CRF model for Chinese Named Entity Recognition
